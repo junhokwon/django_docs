@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render
 
 from .models import Question
@@ -11,7 +11,14 @@ def index(request):
     return render(request, 'polls/index.html',context=context)
 
 def detail(request,question_id):
-    return HttpResponse('너는 질문을 보고있다 %s.' % question_id)
+    try:
+        question = Question.objects.get(pk=question_id)
+    except Question.DoesNotExist as e:
+        raise Http404('Question does not Exist')
+    context = {
+        'question' : question,
+    }
+    return render(request, 'polls/detail.html',context=context)
 
 def results(request, question_id):
     response = "너는 질문의 결과를 보고있다. %s."
